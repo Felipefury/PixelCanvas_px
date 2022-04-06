@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name         PX
-// @namespace    http://tampermonkey.net/
-// @version      1
+// @namespace    Watch Canvas
+// @version      1.2
 // @description  sexo
-// @author       GM
+// @author       GM#4630
 // @match        https://pixelcanvas.io/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=pixelcanvas.io
 // @grant        none
@@ -11,70 +11,47 @@
 
 (function() {
 
-   var coord, offset = { x: 0, y: 0 }, pixels = [];
+   var center, pixels = [], offset = { x: 0, y: 0 }, colors = [[255,255,255],[228,228,228],[136,136,136],[34,34,34],[255,167,209],[229,0,0],[229,149,0],[160,106,66],[229,217,0],[148,224,68],[2,190,1],[0,211,221],[0,131,199],[0,0,234],[207,110,228],[130,0,128]];
    var ctx = document.getElementById("gameWindow").getContext("2d");
-   var evtSource = new EventSource('https://pixelcanvas.io/events?fingerprint=' + fingerprint());
+   var evtSource = new EventSource('https://pixelcanvas.io/events?fingerprint=' + Math.random().toString(36).substring(2, 10).repeat(4));
 
    function init() {
 
-      coord = window.location.pathname.substring(2).split(',');
+      center = window.location.pathname.substring(2).split(',');
 
-      offset.x = parseInt(coord[0]) - (window.innerWidth / 2);
-      offset.y = parseInt(coord[1]) - (window.innerHeight / 2);
+      offset.x = parseInt(center[0]) - (window.innerWidth / 2);
+      offset.y = parseInt(center[1]) - (window.innerHeight / 2);
 
-      pixels.forEach(function(obj){
+      pixels.forEach(function(pixel, index){
 
-         ctx.fillStyle = "rgba(" + colorsRGB[obj.color] + ", 0.9)";
+         pixel.increase ? pixel.size += .6 : pixel.size -= 1.2;
+
+         if(55 < pixel.size) {
+            pixel.increase = false;
+         };
+
+         if(0 > pixel.size) {
+            return delete pixels[index];
+         };
+
+         ctx.fillStyle = "rgba(" + colors[pixel.color] + ", 0.7)";
          ctx.beginPath();
-         ctx.arc(obj.x - offset.x, obj.y - offset.y, obj.size, 0, 2 * Math.PI);
+         ctx.arc(pixel.x - offset.x, pixel.y - offset.y, pixel.size, 0, 2 * Math.PI);
          ctx.closePath();
          ctx.fill();
-
-         obj.size > 50 || obj.size == 0 ? obj.size = 0 : obj.size += .7
-
-         if(obj.size == 0) {
-            delete obj
-         };
 
       });
 
       window.requestAnimationFrame(init);
    };
 
-   init()
-
    evtSource.onmessage = function(e) {
-       let obj = JSON.parse(e.data);
-       obj['size'] = 1
-       pixels.push(obj);
+      let pixel = JSON.parse(e.data);
+      pixel.size = 1;
+      pixel.increase = true;
+      pixels.unshift(pixel);
    };
 
-   function fingerprint() {
-      let _fingerprint = "", possible = "abcdefghijklmnopqrstuvwxyz0123456789", i;
+   init();
 
-      for (i = 0; i < 32; i++) {
-         _fingerprint += possible.charAt(Math.floor(Math.random() * possible.length));
-      };
-
-      return _fingerprint;
-   };
-
-   const colorsRGB = [
-      [255,255,255],
-      [228,228,228],
-      [136,136,136],
-      [34,34,34],
-      [255,167,209],
-      [229,0,0],
-      [229,149,0],
-      [160,106,66],
-      [229,217,0],
-      [148,224,68],
-      [2,190,1],
-      [0,211,221],
-      [0,131,199],
-      [0,0,234],
-      [207,110,228],
-      [130,0,128]
-   ];
 })();
