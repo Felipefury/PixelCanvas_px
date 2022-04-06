@@ -1,7 +1,9 @@
 // ==UserScript==
 // @name         PX
 // @namespace    Watch Canvas
-// @version      1.2
+// @version      1.3
+// @updateURL    https://github.com/Felipefury/PixelCanvas_px/raw/main/index.user.js
+// @downloadURL  https://github.com/Felipefury/PixelCanvas_px/raw/main/index.user.js
 // @description  sexo
 // @author       GM#4630
 // @match        https://pixelcanvas.io/*
@@ -24,7 +26,7 @@
 
       pixels.forEach(function(pixel, index){
 
-         pixel.increase ? pixel.size += .6 : pixel.size -= 1.2;
+         pixel.increase ? pixel.size += .9 : pixel.size -= 1;
 
          if(55 < pixel.size) {
             pixel.increase = false;
